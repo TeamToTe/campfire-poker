@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campfire Poker</title>
+  <title>🔥 Campfire Poker - RPG Edition</title>
   <link rel="icon" type="image/jpeg" href="assets/web-icon-black-heart.jpg">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,7 +13,7 @@
   <header>
     <div class="brand-title">
       <span>🔥 CAMPFIRE POKER</span>
-      <span class="edition-tag">[PIXEL ART EDITION]</span>
+      <span class="edition-tag">[RPG PIXEL EDITION]</span>
     </div>
     <div class="header-status">
       <span class="badge" id="server-status-badge">🟡 CONNECTING...</span>
@@ -22,7 +22,6 @@
       <button class="btn-pixel btn-reset" id="btn-reset-table" title="Reset all player chips to $1,000">🔄 RESET TABLE</button>
       <button class="btn-pixel" id="btn-audio">🔊 SFX: ON</button>
     </div>
-
   </header>
 
   <!-- Main Game Viewport -->
@@ -37,7 +36,9 @@
       <!-- Total Pot Badge (Top Left Corner) -->
       <div class="pot-container pixel-box-gold" id="pot-badge-corner">
         <span class="pot-label">TOTAL POT:</span>
-        <span class="pot-amount" id="pot-amount">$0</span>
+        <div class="pot-chip-display">
+          <span class="pot-amount" id="pot-amount">$0</span>
+        </div>
       </div>
 
       <!-- Table Center (Community Cards & Stage Badge above Campfire) -->
@@ -51,66 +52,100 @@
         </div>
       </div>
 
-      <!-- 4 Player Seats arranged around Campfire Logs -->
+      <!-- 4 RPG Player Seats arranged around Campfire Logs -->
       <div class="players-container">
         
-        <!-- Seat 0: South Log (Bottom) -->
+        <!-- Seat 0: South Log (Hero - Bottom) -->
         <div class="player-seat seat-0" id="seat-pos-0" data-seat-idx="0">
-          <div class="player-badge pixel-box">
-            <div class="player-name" id="name-seat-0">👑 YOU (HERO)</div>
-            <div class="player-chips" id="chips-seat-0">$1,000</div>
-            <div class="player-action-tag" id="action-seat-0"></div>
+          <div class="speech-bubble" id="bubble-seat-0"></div>
+          <div class="player-badge pixel-box badge-hero">
+            <div class="avatar-frame">
+              <span class="avatar-icon" id="avatar-icon-0">👑</span>
+            </div>
+            <div class="player-info-column">
+              <div class="player-name" id="name-seat-0">YOU (HERO)</div>
+              <div class="player-chips" id="chips-seat-0">$1,000</div>
+              <div class="player-action-tag" id="action-seat-0"></div>
+            </div>
           </div>
           <div class="player-cards-row" id="cards-seat-0"></div>
         </div>
 
-        <!-- Seat 1: West Log (Left) -->
+        <!-- Seat 1: West Log (Alex Rogue - Left) -->
         <div class="player-seat seat-1" id="seat-pos-1" data-seat-idx="1">
-          <div class="player-badge pixel-box">
-            <div class="player-name" id="name-seat-1">🗡️ ALEX (ROGUE)</div>
-            <div class="player-chips" id="chips-seat-1">$1,000</div>
-            <div class="player-action-tag" id="action-seat-1"></div>
+          <div class="speech-bubble" id="bubble-seat-1"></div>
+          <div class="player-badge pixel-box badge-rogue">
+            <div class="avatar-frame">
+              <span class="avatar-icon" id="avatar-icon-1">🗡️</span>
+            </div>
+            <div class="player-info-column">
+              <div class="player-name" id="name-seat-1">ALEX (ROGUE)</div>
+              <div class="player-chips" id="chips-seat-1">$1,000</div>
+              <div class="player-action-tag" id="action-seat-1"></div>
+            </div>
           </div>
           <div class="player-cards-row" id="cards-seat-1"></div>
         </div>
 
-        <!-- Seat 2: North Log (Top) -->
+        <!-- Seat 2: North Log (Bella Wizard - Top) -->
         <div class="player-seat seat-2" id="seat-pos-2" data-seat-idx="2">
-          <div class="player-badge pixel-box">
-            <div class="player-name" id="name-seat-2">🧙‍♀️ BELLA (WIZARD)</div>
-            <div class="player-chips" id="chips-seat-2">$1,000</div>
-            <div class="player-action-tag" id="action-seat-2"></div>
+          <div class="speech-bubble" id="bubble-seat-2"></div>
+          <div class="player-badge pixel-box badge-wizard">
+            <div class="avatar-frame">
+              <span class="avatar-icon" id="avatar-icon-2">🧙‍♀️</span>
+            </div>
+            <div class="player-info-column">
+              <div class="player-name" id="name-seat-2">BELLA (WIZARD)</div>
+              <div class="player-chips" id="chips-seat-2">$1,000</div>
+              <div class="player-action-tag" id="action-seat-2"></div>
+            </div>
           </div>
           <div class="player-cards-row" id="cards-seat-2"></div>
         </div>
 
-        <!-- Seat 3: East Log (Right) -->
+        <!-- Seat 3: East Log (Charlie Knight - Right) -->
         <div class="player-seat seat-3" id="seat-pos-3" data-seat-idx="3">
-          <div class="player-badge pixel-box">
-            <div class="player-name" id="name-seat-3">🛡️ CHARLIE (KNIGHT)</div>
-            <div class="player-chips" id="chips-seat-3">$1,000</div>
-            <div class="player-action-tag" id="action-seat-3"></div>
+          <div class="speech-bubble" id="bubble-seat-3"></div>
+          <div class="player-badge pixel-box badge-knight">
+            <div class="avatar-frame">
+              <span class="avatar-icon" id="avatar-icon-3">🛡️</span>
+            </div>
+            <div class="player-info-column">
+              <div class="player-name" id="name-seat-3">CHARLIE (KNIGHT)</div>
+              <div class="player-chips" id="chips-seat-3">$1,000</div>
+              <div class="player-action-tag" id="action-seat-3"></div>
+            </div>
           </div>
           <div class="player-cards-row" id="cards-seat-3"></div>
         </div>
 
       </div>
 
-      <!-- Bottom Interactive Action Panel -->
+      <!-- Bottom Interactive Action Panel (RPG HUD) -->
       <div id="action-panel" class="pixel-box">
         
-        <div class="hand-rating-banner" id="hand-rating-banner">
-          YOUR HAND: CHOOSE SEAT & DEAL TO BEGIN
+        <!-- Hand Rating & Fire Gauge Banner -->
+        <div class="hand-gauge-wrapper">
+          <div class="hand-rating-banner" id="hand-rating-banner">
+            YOUR HAND: CHOOSE SEAT & DEAL TO BEGIN
+          </div>
+          <div class="hand-flame-meter" title="Hand Strength Gauge">
+            <span class="flame-icon">🔥</span>
+            <div class="flame-bar-track">
+              <div class="flame-bar-fill" id="flame-bar-fill" style="width: 15%;"></div>
+            </div>
+            <span class="flame-percent" id="flame-percent">15%</span>
+          </div>
         </div>
 
         <div class="controls-row">
-          <button class="btn-pixel btn-gold" id="btn-start-hand">🔥 DEAL HAND</button>
+          <button class="btn-pixel btn-gold btn-hud" id="btn-start-hand">🔥 DEAL HAND</button>
           
-          <button class="btn-pixel btn-red" id="btn-fold" disabled>FOLD</button>
-          <button class="btn-pixel" id="btn-check-call" disabled>CHECK</button>
+          <button class="btn-pixel btn-red btn-hud" id="btn-fold" disabled>FOLD</button>
+          <button class="btn-pixel btn-hud" id="btn-check-call" disabled>CHECK</button>
 
           <div class="raise-control-group">
-            <button class="btn-pixel btn-green" id="btn-raise" disabled>RAISE</button>
+            <button class="btn-pixel btn-green btn-hud" id="btn-raise" disabled>RAISE</button>
             <input type="range" class="raise-slider" id="raise-slider" min="20" max="1000" step="10" value="20">
             <span id="raise-val-display" class="raise-val-display">$20</span>
           </div>

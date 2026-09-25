@@ -1,5 +1,5 @@
 /**
- * Main Application Controller for Campfire Poker
+ * Main Application Controller for Campfire Poker - RPG Edition
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const stageBadge = document.getElementById('stage-badge');
   const communityCardsBox = document.getElementById('community-cards-container');
   const handRatingBanner = document.getElementById('hand-rating-banner');
+  const flameBarFill = document.getElementById('flame-bar-fill');
+  const flamePercent = document.getElementById('flame-percent');
 
   // Modals
   const modalSeatPicker = document.getElementById('modal-seat-picker');
@@ -45,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnCloseWinner = document.getElementById('btn-close-winner');
   const logContent = document.getElementById('log-content');
 
-  // 3. Time Cycle Control (Dawn 06:00 -> Noon 12:00 -> Dusk 18:00 -> Midnight 00:00)
+  // 3. Time Cycle Control
   const TIME_PRESETS = [
     { hour: 6.0, label: "Dawn (6:00 AM)" },
     { hour: 12.0, label: "Noon (12:00 PM)" },
@@ -70,19 +72,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-
   const SEAT_NAMES = ["SOUTH", "WEST", "NORTH", "EAST"];
   let selectedSeatIdx = 0;
   let currentState = null;
   let prevStage = null;
+  const bubbleTimeouts = {};
 
-  // 3. Sound Toggle
+  // 4. Character Dialogue Quotes Matrix
+  const DIALOGUES = {
+    'bot_alex': {
+      'fold': ["Not worth my daggers.", "I'll get you next hand!", "Tch, you got lucky."],
+      'check': ["Checking... for now.", "Show me what you got.", "Careful step."],
+      'call': ["I'll match that!", "Seeing this through.", "Call it is!"],
+      'raise': ["All-in or go home!", "Let's spice this up!", "Think you can handle this raise?", "Time to strike!"],
+      'win': ["The loot is mine!", "Too easy for a rogue!", "Never challenge my luck!"]
+    },
+    'bot_bella': {
+      'fold': ["Probability is against me.", "A wise retreat.", "The stars advise caution."],
+      'check': ["Observing the arcane flow.", "Check.", "Patience reveals all."],
+      'call': ["A calculated call.", "Within variance.", "I accept your wager."],
+      'raise': ["The arcane cards favor me!", "Raising the stakes.", "92% win expectancy!"],
+      'win': ["Just as the spells foretold.", "Wisdom triumphs over brute luck.", "Splendid outcome!"]
+    },
+    'bot_charlie': {
+      'fold': ["Discretion is valor.", "I yield this skirmish.", "Tactical regroup."],
+      'check': ["Holding the line.", "Check.", "Steadfast."],
+      'call': ["For honor, I call!", "I stand my ground.", "Matched with resolve."],
+      'raise': ["Forward march!", "To glory!", "Stand and face my knight's raise!"],
+      'win': ["Victory for the realm!", "Honor has prevailed!", "A noble triumph!"]
+    },
+    'p_human': {
+      'fold': ["Fold.", "Live to fight another hand."],
+      'check': ["Check."],
+      'call': ["I call!"],
+      'raise': ["Let's raise it!", "I'm pushing chips!"],
+      'win': ["Victory is mine! 👑"]
+    }
+  };
+
+  function showSpeechBubble(seatIdx, text) {
+    const bubble = document.getElementById(`bubble-seat-${seatIdx}`);
+    if (!bubble) return;
+
+    bubble.innerText = text;
+    bubble.classList.add('show');
+
+    if (bubbleTimeouts[seatIdx]) {
+      clearTimeout(bubbleTimeouts[seatIdx]);
+    }
+
+    bubbleTimeouts[seatIdx] = setTimeout(() => {
+      bubble.classList.remove('show');
+    }, 3200);
+  }
+
+  function triggerCharacterDialogue(player, action) {
+    if (!player) return;
+    const quotes = DIALOGUES[player.id] ? DIALOGUES[player.id][action] : null;
+    if (quotes && quotes.length > 0) {
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      showSpeechBubble(player.seat_idx, q);
+    }
+  }
+
+  // 5. Sound Toggle
   btnAudio.addEventListener('click', () => {
     const isMuted = window.AudioSynth.toggleMute();
     btnAudio.innerText = isMuted ? "🔇 SFX: OFF" : "🔊 SFX: ON";
   });
 
-  // 4. Seat Picker Modal Logic
+  // 6. Seat Picker Modal Logic
   function openSeatPicker() {
     if (currentState && currentState.hero_seat_idx !== undefined) {
       selectedSeatIdx = currentState.hero_seat_idx;
@@ -151,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Click on table seats directly to open visual seat picker when waiting
   document.querySelectorAll('.player-seat').forEach(seatElem => {
     seatElem.addEventListener('click', () => {
       if (currentState && (currentState.stage === 'WAITING' || currentState.stage === 'SHOWDOWN')) {
@@ -162,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 5. Custom Reset Table Modal Logic
+  // 7. Custom Reset Table Modal Logic
   btnResetTable.addEventListener('click', () => {
     modalResetTable.classList.add('show');
     if (window.AudioSynth) window.AudioSynth.playChipStack();
@@ -179,7 +237,6 @@ document.addEventListener('DOMContentLoaded', () => {
     logMessage("Table reset to default $1,000 per player.");
   });
 
-  // Close modals on clicking overlay backdrop
   [modalSeatPicker, modalResetTable].forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
@@ -188,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. Connect Backend Client
+  // 8. Connect Backend Client
   window.BackendClient.init(
     (state, lastEvent) => onGameStateUpdate(state, lastEvent),
     (isConnected, statusText) => {
@@ -197,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   );
 
-  // 7. Raise Slider & Presets
+  // 9. Raise Slider & Presets
   raiseSlider.addEventListener('input', () => {
     raiseValDisplay.innerText = `$${raiseSlider.value}`;
   });
@@ -233,10 +290,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hero) {
       raiseSlider.value = hero.chips;
       raiseValDisplay.innerText = `$${hero.chips}`;
+      if (window.AudioSynth) window.AudioSynth.playAllIn();
     }
   });
 
-  // 8. Action Button Handlers
+  // 10. Action Button Handlers
   btnStartHand.addEventListener('click', async () => {
     winnerOverlay.classList.remove('show');
     if (currentState && currentState.stage === 'WAITING' && !currentState.hand_in_progress) {
@@ -249,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnFold.addEventListener('click', async () => {
     if (window.AudioSynth) window.AudioSynth.playFold();
+    triggerCharacterDialogue({ id: 'p_human', seat_idx: selectedSeatIdx }, 'fold');
     await window.BackendClient.executeAction('p_human', 'fold');
   });
 
@@ -264,12 +323,15 @@ document.addEventListener('DOMContentLoaded', () => {
       window.AudioSynth.playChipStack();
     }
 
+    triggerCharacterDialogue(hero, action);
     await window.BackendClient.executeAction('p_human', action);
   });
 
   btnRaise.addEventListener('click', async () => {
     const amt = parseInt(raiseSlider.value, 10);
     if (window.AudioSynth) window.AudioSynth.playChipStack();
+    const hero = currentState && currentState.players ? currentState.players.find(p => p.id === 'p_human') : null;
+    if (hero) triggerCharacterDialogue(hero, 'raise');
     await window.BackendClient.executeAction('p_human', 'raise', amt);
   });
 
@@ -278,26 +340,35 @@ document.addEventListener('DOMContentLoaded', () => {
     btnStartHand.click();
   });
 
-  // 9. Game State UI Renderer
+  // 11. Game State UI Renderer
   function onGameStateUpdate(state, lastEvent = "") {
     if (!state) return;
     currentState = state;
 
     if (lastEvent) {
       logMessage(lastEvent);
+
+      // Trigger dialogues based on event text
+      if (state.players) {
+        state.players.forEach(p => {
+          if (lastEvent.includes(p.name) || lastEvent.includes(p.id)) {
+            if (lastEvent.includes('folded')) triggerCharacterDialogue(p, 'fold');
+            else if (lastEvent.includes('raise') || lastEvent.includes('All-In')) triggerCharacterDialogue(p, 'raise');
+            else if (lastEvent.includes('call')) triggerCharacterDialogue(p, 'call');
+            else if (lastEvent.includes('check')) triggerCharacterDialogue(p, 'check');
+          }
+        });
+      }
     }
 
-    // Play deal SFX when new stage occurs
     if (state.stage !== prevStage && (state.stage === 'FLOP' || state.stage === 'TURN' || state.stage === 'RIVER')) {
       if (window.AudioSynth) window.AudioSynth.playCardDeal();
     }
     prevStage = state.stage;
 
-    // Header & Stage info
     stageBadge.innerText = `STAGE: ${state.stage}`;
     potAmountDisplay.innerText = `$${state.pot}`;
 
-    // Update Seat Button Title
     const heroSeat = (state.hero_seat_idx !== undefined) ? state.hero_seat_idx : selectedSeatIdx;
     selectedSeatIdx = heroSeat;
     btnOpenSeatPicker.innerText = `🪑 SEAT: ${SEAT_NAMES[heroSeat] || 'SOUTH'}`;
@@ -319,14 +390,13 @@ document.addEventListener('DOMContentLoaded', () => {
       communityCardsBox.appendChild(placeholder);
     }
 
-    // Render 4 Seats dynamically
+    // Render 4 Player Seats
     if (state.players) {
       state.players.forEach((p, idx) => {
         const seatIdx = (p.seat_idx !== undefined) ? p.seat_idx : idx;
         const seatElem = document.getElementById(`seat-pos-${seatIdx}`);
         if (!seatElem) return;
 
-        // Turn indicator glow
         const isTurn = (state.current_player_id === p.id) && state.stage !== 'SHOWDOWN' && state.stage !== 'WAITING';
         if (isTurn) {
           seatElem.classList.add('active-turn');
@@ -334,11 +404,19 @@ document.addEventListener('DOMContentLoaded', () => {
           seatElem.classList.remove('active-turn');
         }
 
-        // Name, Chips & Action Tags
         const nameElem = document.getElementById(`name-seat-${seatIdx}`);
         const chipsElem = document.getElementById(`chips-seat-${seatIdx}`);
         const actionElem = document.getElementById(`action-seat-${seatIdx}`);
+        const avatarIconElem = document.getElementById(`avatar-icon-${seatIdx}`);
 
+        const avatarIcons = {
+          'hero': '👑',
+          'rogue': '🗡️',
+          'wizard': '🧙‍♀️',
+          'knight': '🛡️'
+        };
+
+        if (avatarIconElem) avatarIconElem.innerText = avatarIcons[p.avatar] || (p.is_ai ? '🤖' : '👑');
         if (nameElem) nameElem.innerText = p.name.toUpperCase();
         if (chipsElem) chipsElem.innerText = `$${p.chips}`;
 
@@ -366,7 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
               cardsContainer.appendChild(cardElem);
             });
           } else if (!p.folded && state.stage !== 'WAITING' && state.hand_in_progress) {
-            // Face-down opponent cards
             cardsContainer.appendChild(window.SpriteRenderer.createCardElement(null, true));
             cardsContainer.appendChild(window.SpriteRenderer.createCardElement(null, true));
           }
@@ -387,14 +464,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (callNeeded > 0) {
         if (callNeeded >= hero.chips) {
           btnCheckCall.innerText = `ALL-IN $${hero.chips}`;
-          btnCheckCall.className = "btn-pixel btn-red";
+          btnCheckCall.className = "btn-pixel btn-red btn-hud";
         } else {
           btnCheckCall.innerText = `CALL $${callNeeded}`;
-          btnCheckCall.className = "btn-pixel btn-green";
+          btnCheckCall.className = "btn-pixel btn-green btn-hud";
         }
       } else {
         btnCheckCall.innerText = "CHECK";
-        btnCheckCall.className = "btn-pixel";
+        btnCheckCall.className = "btn-pixel btn-hud";
       }
 
       const minR = state.min_raise || 20;
@@ -406,13 +483,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Hand Evaluator Banner
+    // Hand Strength Flame Gauge & Rating Banner
     if (hero && hero.cards && hero.cards.length === 2) {
       const allCards = [...hero.cards, ...(state.community_cards || [])];
-      const desc = getHandDescription(allCards);
-      handRatingBanner.innerText = `YOUR HAND: ${desc.toUpperCase()}`;
+      const evalRes = evaluateHandStrength(allCards);
+      handRatingBanner.innerText = `YOUR HAND: ${evalRes.desc.toUpperCase()}`;
+      flameBarFill.style.width = `${evalRes.pct}%`;
+      flamePercent.innerText = `${evalRes.pct}%`;
     } else {
       handRatingBanner.innerText = "YOUR HAND: CHOOSE SEAT & DEAL TO BEGIN";
+      flameBarFill.style.width = "10%";
+      flamePercent.innerText = "10%";
     }
 
     // Deal Hand button status
@@ -424,24 +505,33 @@ document.addEventListener('DOMContentLoaded', () => {
       btnStartHand.disabled = true;
     }
 
-    // Show Winner Overlay if Showdown
+    // Show Winner Overlay & Trigger Win Fanfare
     if (state.stage === 'SHOWDOWN' && state.winners_info && state.winners_info.length > 0) {
       const w = state.winners_info[0];
       winnerDesc.innerText = `${w.name} wins $${w.win_amount} with ${w.hand_name}!`;
       winnerOverlay.classList.add('show');
       if (window.AudioSynth) window.AudioSynth.playWinFanfare();
+
+      const winningPlayer = state.players ? state.players.find(p => p.id === w.player_id) : null;
+      if (winningPlayer) triggerCharacterDialogue(winningPlayer, 'win');
     }
   }
 
-  function getHandDescription(cards) {
+  // Hand Strength & Flame Gauge Evaluator
+  function evaluateHandStrength(cards) {
     if (cards.length === 2) {
       const r1 = cards[0].rank, r2 = cards[1].rank;
       const rankNames = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
       const suitSyms = { 'clubs': '♣', 'spades': '♠', 'hearts': '♥', 'diamonds': '♦' };
       const c1 = `${rankNames[r1] || r1}${suitSyms[cards[0].suit] || ''}`;
       const c2 = `${rankNames[r2] || r2}${suitSyms[cards[1].suit] || ''}`;
-      if (r1 === r2) return `Pocket Pair of ${rankNames[r1] || r1}s (${c1} ${c2})`;
-      return `Hole Cards (${c1} ${c2})`;
+      if (r1 === r2) {
+        const pct = 35 + Math.floor((r1 / 14) * 25);
+        return { desc: `Pocket Pair of ${rankNames[r1] || r1}s (${c1} ${c2})`, pct };
+      }
+      const highR = Math.max(r1, r2);
+      const pct = 15 + Math.floor((highR / 14) * 15);
+      return { desc: `Hole Cards (${c1} ${c2})`, pct };
     }
 
     const counts = {};
@@ -454,13 +544,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const isFlush = Object.values(suits).some(cnt => cnt >= 5);
     const sortedCounts = Object.values(counts).sort((a, b) => b - a);
 
-    if (sortedCounts[0] >= 4) return "Four of a Kind";
-    if (sortedCounts[0] >= 3 && sortedCounts[1] >= 2) return "Full House";
-    if (isFlush) return "Flush";
-    if (sortedCounts[0] >= 3) return "Three of a Kind";
-    if (sortedCounts[0] >= 2 && sortedCounts[1] >= 2) return "Two Pair";
-    if (sortedCounts[0] >= 2) return "One Pair";
-    return "High Card";
+    if (sortedCounts[0] >= 4) return { desc: "Four of a Kind", pct: 95 };
+    if (sortedCounts[0] >= 3 && sortedCounts[1] >= 2) return { desc: "Full House", pct: 90 };
+    if (isFlush) return { desc: "Flush", pct: 82 };
+    if (sortedCounts[0] >= 3) return { desc: "Three of a Kind", pct: 70 };
+    if (sortedCounts[0] >= 2 && sortedCounts[1] >= 2) return { desc: "Two Pair", pct: 55 };
+    if (sortedCounts[0] >= 2) return { desc: "One Pair", pct: 35 };
+    return { desc: "High Card", pct: 20 };
   }
 
   function logMessage(msg) {
@@ -471,5 +561,5 @@ document.addEventListener('DOMContentLoaded', () => {
     logContent.scrollTop = logContent.scrollHeight;
   }
 
-  logMessage("Campfire Poker initialized. Select your seat and deal hand to start!");
+  logMessage("Campfire Poker RPG Edition initialized. Welcome to the campfire!");
 });

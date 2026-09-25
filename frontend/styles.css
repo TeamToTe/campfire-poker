@@ -6,15 +6,14 @@
   
   --bg-dark: #0D0B18;
   --bg-card: #181528;
-  --panel-bg: rgba(20, 16, 35, 0.92);
+  --panel-bg: rgba(20, 16, 35, 0.94);
   --border-gold: #FCD34D;
   --border-dark: #3A2E50;
   
-  --color-primary: #DC2626;
-  --color-secondary: #2563EB;
-  --color-accent: #22C55E;
-  --color-gold: #F59E0B;
-  --color-purple: #8B5CF6;
+  --color-hero: #F59E0B;
+  --color-rogue: #EF4444;
+  --color-wizard: #A855F7;
+  --color-knight: #3B82F6;
   
   --text-main: #F3F4F6;
   --text-muted: #9CA3AF;
@@ -68,7 +67,7 @@ body {
 /* Header */
 header {
   height: 52px;
-  background: rgba(13, 11, 24, 0.95);
+  background: rgba(13, 11, 24, 0.96);
   border-bottom: 4px solid #231C33;
   display: flex;
   align-items: center;
@@ -127,6 +126,7 @@ header {
   border-color: #4B3B6B;
 }
 
+/* Chunky 3D Arcade Pixel Buttons */
 .btn-pixel {
   font-family: var(--font-pixel);
   font-size: 10px;
@@ -139,8 +139,14 @@ header {
   transition: transform 0.05s, filter 0.1s;
 }
 
+.btn-hud {
+  font-size: 11px;
+  padding: 8px 15px;
+  border-width: 3px;
+}
+
 .btn-pixel:hover:not(:disabled) {
-  filter: brightness(1.15);
+  filter: brightness(1.2);
 }
 
 .btn-pixel:active:not(:disabled) {
@@ -228,7 +234,7 @@ header {
   z-index: 2;
   width: 100%;
   max-width: 1280px;
-  height: calc(100vh - 52px - 88px);
+  height: calc(100vh - 52px - 95px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -257,7 +263,7 @@ header {
 }
 
 .pot-amount {
-  font-size: 15px;
+  font-size: 17px;
   color: #34D399;
   font-family: var(--font-retro);
   font-weight: bold;
@@ -282,12 +288,13 @@ header {
   gap: 8px;
   min-height: 84px;
   padding: 6px 10px;
-  background: rgba(17, 14, 31, 0.90);
+  background: rgba(17, 14, 31, 0.92);
   border: 3px solid #3A2E50;
   border-radius: 4px;
   pointer-events: auto;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
 }
 
 /* Player Seating Layout around Campfire */
@@ -311,63 +318,118 @@ header {
   cursor: pointer;
 }
 
-/* Seat 0: South Log (Bottom) */
+/* Seat Positions */
 .seat-0 {
-  bottom: 24px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* Seat 1: West Log (Left) */
 .seat-1 {
   top: 50%;
   left: 20px;
   transform: translateY(-50%);
 }
 
-/* Seat 2: North Log (Top) */
 .seat-2 {
   top: 15px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* Seat 3: East Log (Right) */
 .seat-3 {
   top: 48%;
   right: 20px;
   transform: translateY(-50%);
 }
 
+/* RPG Avatar Frame & Player Badges */
 .player-badge {
   background: rgba(17, 14, 31, 0.94);
   border: 3px solid #3F3358;
   padding: 6px 10px;
-  min-width: 140px;
-  text-align: center;
+  min-width: 165px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+}
+
+.avatar-frame {
+  width: 34px;
+  height: 34px;
+  background: #110B1F;
+  border: 2px solid #524373;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
+}
+
+.avatar-icon {
+  font-size: 20px;
+}
+
+.player-info-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.badge-hero {
+  border-color: #D97706;
+}
+.badge-hero .avatar-frame {
+  border-color: #FCD34D;
+  background: #3B240B;
+}
+
+.badge-rogue {
+  border-color: #B91C1C;
+}
+.badge-rogue .avatar-frame {
+  border-color: #EF4444;
+  background: #3B0D0D;
+}
+
+.badge-wizard {
+  border-color: #7E22CE;
+}
+.badge-wizard .avatar-frame {
+  border-color: #C084FC;
+  background: #2E1065;
+}
+
+.badge-knight {
+  border-color: #1D4ED8;
+}
+.badge-knight .avatar-frame {
+  border-color: #60A5FA;
+  background: #172554;
 }
 
 .player-seat.active-turn .player-badge {
   border-color: #FCD34D;
-  box-shadow: 0 0 16px #FCD34D;
+  box-shadow: 0 0 18px #FCD34D;
   animation: pulse-border 1s infinite alternate;
 }
 
 @keyframes pulse-border {
-  0% { box-shadow: 0 0 6px #FCD34D; }
-  100% { box-shadow: 0 0 20px #F59E0B; }
+  0% { box-shadow: 0 0 8px #FCD34D; }
+  100% { box-shadow: 0 0 22px #F59E0B; }
 }
 
 .player-name {
-  font-size: 10px;
+  font-size: 9px;
   color: #F3F4F6;
   margin-bottom: 2px;
   white-space: nowrap;
 }
 
 .player-chips {
-  font-size: 11px;
+  font-size: 12px;
   color: #34D399;
   font-family: var(--font-retro);
 }
@@ -375,9 +437,48 @@ header {
 .player-action-tag {
   font-size: 9px;
   color: #FCD34D;
-  margin-top: 3px;
+  margin-top: 2px;
   min-height: 11px;
   font-weight: bold;
+}
+
+/* Dialogue Speech Bubbles */
+.speech-bubble {
+  position: absolute;
+  top: -38px;
+  background: #FFFBEB;
+  color: #1F2937;
+  font-family: var(--font-retro);
+  font-size: 15px;
+  font-weight: bold;
+  padding: 4px 10px;
+  border: 2px solid #78350F;
+  box-shadow: 2px 2px 0px #000;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 30;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #78350F transparent;
+  display: block;
+  width: 0;
+}
+
+.speech-bubble.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .player-cards-row {
@@ -387,6 +488,7 @@ header {
   justify-content: center;
 }
 
+/* Card Sprites & Deal Animation */
 .card-sprite {
   width: 54px;
   height: 72px;
@@ -394,12 +496,31 @@ header {
   border: 1px solid #1E1B2E;
   border-radius: 3px;
   box-shadow: 2px 2px 6px rgba(0,0,0,0.7);
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
   display: inline-block;
+  animation: card-deal-slide 0.35s ease-out;
+}
+
+@keyframes card-deal-slide {
+  0% { transform: translateY(-15px) scale(0.85); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .card-sprite:hover {
   transform: translateY(-4px);
+}
+
+/* Winning Combo Glowing Cards */
+.card-combo-highlight {
+  border: 2px solid #FCD34D !important;
+  box-shadow: 0 0 14px #FCD34D, 0 0 22px #F59E0B !important;
+  transform: translateY(-5px);
+  animation: combo-pulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes combo-pulse {
+  0% { box-shadow: 0 0 8px #FCD34D; }
+  100% { box-shadow: 0 0 20px #F59E0B, 0 0 30px #EF4444; }
 }
 
 .card-back {
@@ -414,7 +535,7 @@ header {
   box-shadow: inset 0 0 4px #000;
 }
 
-/* Bottom Control Panel Fixed Dock */
+/* Bottom Control Panel (RPG HUD) */
 #action-panel {
   position: fixed;
   bottom: 0;
@@ -428,17 +549,57 @@ header {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 -4px 22px rgba(0, 0, 0, 0.95);
+}
+
+/* Hand Strength & Flame Meter */
+.hand-gauge-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(35, 28, 51, 0.85);
+  padding: 4px 10px;
+  border: 2px solid #524373;
 }
 
 .hand-rating-banner {
   font-size: 10px;
   color: #FCD34D;
-  text-align: center;
-  background: rgba(35, 28, 51, 0.8);
-  padding: 4px;
-  border: 2px solid #524373;
   letter-spacing: 0.5px;
+}
+
+.hand-flame-meter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flame-icon {
+  font-size: 14px;
+}
+
+.flame-bar-track {
+  width: 120px;
+  height: 10px;
+  background: #110B1F;
+  border: 2px solid #524373;
+  overflow: hidden;
+  box-shadow: inset 0 0 4px #000;
+}
+
+.flame-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B, #EF4444, #FCD34D);
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px #F59E0B;
+}
+
+.flame-percent {
+  font-family: var(--font-retro);
+  font-size: 15px;
+  color: #34D399;
+  min-width: 32px;
 }
 
 .controls-row {
@@ -564,7 +725,7 @@ header {
   margin-top: 4px;
 }
 
-/* Visual Campfire Seat Arena (Diamond / Compass Layout) */
+/* Visual Campfire Seat Arena */
 .seat-arena-container {
   position: relative;
   width: 360px;
@@ -578,7 +739,6 @@ header {
   border-radius: 8px;
 }
 
-/* Center Campfire Graphic */
 .seat-arena-fire {
   position: absolute;
   top: 50%;
@@ -624,7 +784,7 @@ header {
   margin-top: 2px;
 }
 
-/* Interactive Seat Spots positioned around Fire */
+/* Seat Spots in Arena */
 .seat-spot {
   position: absolute;
   display: flex;
@@ -661,7 +821,6 @@ header {
   100% { box-shadow: 0 0 20px #F59E0B; }
 }
 
-/* North Seat (Top) */
 .seat-spot-north {
   top: 10px;
   left: 50%;
@@ -674,7 +833,6 @@ header {
   transform: translateX(-50%);
 }
 
-/* South Seat (Bottom) */
 .seat-spot-south {
   bottom: 10px;
   left: 50%;
@@ -687,7 +845,6 @@ header {
   transform: translateX(-50%);
 }
 
-/* West Seat (Left) */
 .seat-spot-west {
   left: 10px;
   top: 50%;
@@ -700,7 +857,6 @@ header {
   transform: translateY(-50%);
 }
 
-/* East Seat (Right) */
 .seat-spot-east {
   right: 10px;
   top: 50%;
