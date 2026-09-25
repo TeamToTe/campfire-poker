@@ -505,17 +505,19 @@ class CampfireScene {
     const cx = this.width * 0.5;
     const cy = this.height * 0.52;
 
-    const radial = this.ctx.createRadialGradient(cx, cy, 10, cx, cy, this.width * 0.35);
-    const alphaScale = celestial.fireIntensity * (1.0 - celestial.daylightFactor * 0.6);
+    const glowRadius = Math.max(90, Math.min(200, this.width * 0.22));
+    const alphaScale = celestial.fireIntensity * (0.85 - celestial.daylightFactor * 0.5);
 
-    radial.addColorStop(0, `rgba(251, 191, 36, ${0.45 * alphaScale})`);
-    radial.addColorStop(0.3, `rgba(245, 158, 11, ${0.25 * alphaScale})`);
-    radial.addColorStop(0.7, `rgba(180, 83, 9, ${0.08 * alphaScale})`);
+    const radial = this.ctx.createRadialGradient(cx, cy, 6, cx, cy, glowRadius);
+
+    radial.addColorStop(0, `rgba(251, 191, 36, ${0.22 * alphaScale})`);
+    radial.addColorStop(0.35, `rgba(245, 158, 11, ${0.11 * alphaScale})`);
+    radial.addColorStop(0.75, `rgba(180, 83, 9, ${0.03 * alphaScale})`);
     radial.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
     this.ctx.fillStyle = radial;
     this.ctx.beginPath();
-    this.ctx.arc(cx, cy, this.width * 0.35, 0, Math.PI * 2);
+    this.ctx.arc(cx, cy, glowRadius, 0, Math.PI * 2);
     this.ctx.fill();
   }
 
