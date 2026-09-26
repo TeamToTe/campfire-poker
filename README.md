@@ -1,6 +1,12 @@
 # 🏕️ Summer Night Campfire Poker (Pixel Art Edition)
 
+[![Live Demo](https://img.shields.io/badge/🎮_Live_Demo-Play_Online-success?style=for-the-badge&logo=railway)](https://campfire-poker-production.up.railway.app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
+
 Web game Poker Texas Hold'em phong cách Pixel Art độc đáo, lấy cảm hứng thiết kế từ khung cảnh đêm mưa dại trại bên đốm lửa trại (`assets/style.jpg`). Game tích hợp đầy đủ hệ thống cắt Sprite từ hình ảnh lá bài (`assets/cards.jpg`) và chip cược (`assets/chips.jpg`), cùng âm thanh 8-bit retro được tổng hợp trực tiếp bằng Web Audio API.
+
+👉 **Chơi trực tiếp tại:** [https://campfire-poker-production.up.railway.app](https://campfire-poker-production.up.railway.app)
 
 ---
 
