@@ -43,9 +43,9 @@ class Player:
         self.hand = []
         self.current_bet = 0
         self.total_bet_in_hand = 0
-        self.folded = False
+        self.folded = (self.chips <= 0)
         self.is_all_in = False
-        self.last_action = ""
+        self.last_action = "" if self.chips > 0 else "Out of Chips"
 
     def reset_for_round(self):
         self.current_bet = 0
@@ -134,12 +134,11 @@ class PokerEngine:
         return True
 
     def start_new_hand(self) -> bool:
-        active = [p for p in self.players if p.chips > 0]
-        if len(active) < 2:
-            for p in self.players:
-                if p.chips == 0:
-                    p.chips = 1000
-            active = [p for p in self.players if p.chips > 0]
+        # Automatically reload any players who are out of chips to keep the 4-player table active
+        for p in self.players:
+            if p.chips <= 0:
+                p.chips = 1000
+                self.action_history.append(f"💰 {p.name} reloaded $1,000 chips!")
 
         self.deck = Deck()
         self.community_cards = []
@@ -304,16 +303,18 @@ class PokerEngine:
         return True, "Action completed."
 
     def _is_betting_round_complete(self) -> bool:
-        active = [p for p in self.players if not p.folded]
+        active = [p for p in self.players if not p.folded and (p.chips > 0 or p.total_bet_in_hand > 0)]
         if len(active) <= 1:
             return True
 
-        capable = [p for p in active if not p.is_all_in]
+        capable = [p for p in active if not p.is_all_in and p.chips > 0]
         if len(capable) == 0:
             return True
 
-        if len(capable) == 1 and capable[0].current_bet == self.current_high_bet and capable[0].last_action:
-            return True
+        if len(capable) == 1:
+            c = capable[0]
+            if c.current_bet == self.current_high_bet and c.last_action:
+                return True
 
         for p in capable:
             if not p.last_action or p.current_bet < self.current_high_bet:
@@ -329,7 +330,7 @@ class PokerEngine:
         self.min_raise = self.big_blind
         self.last_raise_diff = self.big_blind
 
-        active_unfolded = [p for p in self.players if not p.folded]
+        active_unfolded = [p for p in self.players if not p.folded and (p.chips > 0 or p.total_bet_in_hand > 0)]
         if len(active_unfolded) <= 1:
             self._handle_single_winner(active_unfolded[0] if active_unfolded else self.players[0])
             return
@@ -357,19 +358,23 @@ class PokerEngine:
         self.current_player_idx = self._next_player_to_act(self.button_idx)
 
     def _check_all_in_fast_forward(self) -> bool:
-        active = [p for p in self.players if not p.folded]
-        capable = [p for p in active if not p.is_all_in]
+        active = [p for p in self.players if not p.folded and (p.chips > 0 or p.total_bet_in_hand > 0)]
+        capable = [p for p in active if not p.is_all_in and p.chips > 0]
 
         if len(active) >= 2 and len(capable) <= 1:
-            if self._is_betting_round_complete():
-                while len(self.community_cards) < 5:
-                    if len(self.community_cards) == 0:
-                        self.community_cards.extend(self.deck.draw(3))
-                    else:
-                        self.community_cards.extend(self.deck.draw(1))
-                self.stage = 'SHOWDOWN'
-                self._handle_showdown(active)
-                return True
+            if len(capable) == 1:
+                c = capable[0]
+                if c.current_bet < self.current_high_bet:
+                    return False
+
+            while len(self.community_cards) < 5:
+                if len(self.community_cards) == 0:
+                    self.community_cards.extend(self.deck.draw(3))
+                else:
+                    self.community_cards.extend(self.deck.draw(1))
+            self.stage = 'SHOWDOWN'
+            self._handle_showdown(active)
+            return True
         return False
 
     def _handle_single_winner(self, winner: Player):

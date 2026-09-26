@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
               const cardElem = window.SpriteRenderer.createCardElement(c, false);
               cardsContainer.appendChild(cardElem);
             });
-          } else if (!p.folded && state.stage !== 'WAITING' && state.hand_in_progress) {
+          } else if (!p.folded && (p.chips > 0 || p.total_bet_in_hand > 0) && state.stage !== 'WAITING' && state.hand_in_progress) {
             cardsContainer.appendChild(window.SpriteRenderer.createCardElement(null, true));
             cardsContainer.appendChild(window.SpriteRenderer.createCardElement(null, true));
           }
@@ -519,19 +519,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Hand Strength & Flame Gauge Evaluator
   function evaluateHandStrength(cards) {
+    if (!cards || cards.length === 0) return { desc: "No Cards", pct: 10 };
+    const rankNames = { 10: '10', 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
+    const suitSyms = { 'clubs': 'C', 'spades': 'S', 'hearts': 'H', 'diamonds': 'D' };
+
     if (cards.length === 2) {
       const r1 = cards[0].rank, r2 = cards[1].rank;
-      const rankNames = { 11: 'J', 12: 'Q', 13: 'K', 14: 'A' };
-      const suitSyms = { 'clubs': '♣', 'spades': '♠', 'hearts': '♥', 'diamonds': '♦' };
-      const c1 = `${rankNames[r1] || r1}${suitSyms[cards[0].suit] || ''}`;
-      const c2 = `${rankNames[r2] || r2}${suitSyms[cards[1].suit] || ''}`;
+      const n1 = rankNames[r1] || String(r1);
+      const n2 = rankNames[r2] || String(r2);
+      const s1 = suitSyms[cards[0].suit] || '';
+      const s2 = suitSyms[cards[1].suit] || '';
       if (r1 === r2) {
         const pct = 35 + Math.floor((r1 / 14) * 25);
-        return { desc: `Pocket Pair of ${rankNames[r1] || r1}s (${c1} ${c2})`, pct };
+        return { desc: `Pocket Pair of ${n1}s (${n1}${s1}, ${n2}${s2})`, pct };
       }
       const highR = Math.max(r1, r2);
       const pct = 15 + Math.floor((highR / 14) * 15);
-      return { desc: `Hole Cards (${c1} ${c2})`, pct };
+      return { desc: `Hole Cards (${n1}${s1}, ${n2}${s2})`, pct };
     }
 
     const counts = {};

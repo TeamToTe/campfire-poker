@@ -114,11 +114,65 @@ def test_seat_selection():
     assert engine.hero_seat_idx == 2
 
 
+def test_all_in_and_subsequent_hands():
+    """Verify that when a player goes all-in and wins/loses, the board cards deal completely and next hand continues seamlessly."""
+    engine = PokerEngine(small_blind=10, big_blind=20)
+    p0 = Player('p_human', 'Hero', chips=1000, is_ai=False)
+    p1 = Player('bot_alex', 'Alex', chips=1000, is_ai=True)
+    p2 = Player('bot_bella', 'Bella', chips=1000, is_ai=True)
+    p3 = Player('bot_charlie', 'Charlie', chips=1000, is_ai=True)
+
+    engine.add_player(p0)
+    engine.add_player(p1)
+    engine.add_player(p2)
+    engine.add_player(p3)
+
+    engine.start_new_hand()
+    # Hero goes All-In for 1000
+    p_allin = engine.players[engine.current_player_idx].id
+    engine.execute_action(p_allin, 'raise', 1000)
+
+    # Alex calls All-In for 1000
+    p_call = engine.players[engine.current_player_idx].id
+    engine.execute_action(p_call, 'call')
+
+    # Bella and Charlie fold to the all-in bet
+    while engine.stage == 'PREFLOP':
+        cp = engine.players[engine.current_player_idx]
+        engine.execute_action(cp.id, 'fold')
+
+    # Showdown must have completed with 5 community cards
+    assert engine.stage == 'SHOWDOWN'
+    assert len(engine.community_cards) == 5
+    assert len(engine.winners_info) > 0
+
+    # Start next hand: verify that 0-chip players are reloaded and table plays through FLOP/TURN/RIVER
+    engine.start_new_hand()
+    assert engine.stage == 'PREFLOP'
+    for p in engine.players:
+        assert p.chips > 0
+        assert len(p.hand) == 2
+
+    # Advance betting round by everyone checking/calling
+    for _ in range(4):
+        if engine.stage != 'PREFLOP':
+            break
+        cp = engine.players[engine.current_player_idx]
+        call_needed = engine.current_high_bet - cp.current_bet
+        act = 'call' if call_needed > 0 else 'check'
+        engine.execute_action(cp.id, act)
+
+    # Must have transitioned past PREFLOP into FLOP or further
+    assert engine.stage in ['FLOP', 'TURN', 'RIVER', 'SHOWDOWN']
+    assert len(engine.community_cards) >= 3
+
+
 if __name__ == '__main__':
     test_evaluator_hierarchy()
     test_poker_engine_gameplay()
     test_ai_agent_decisions()
     test_seat_selection()
+    test_all_in_and_subsequent_hands()
     print("All backend poker unit tests PASSED successfully!")
 
 
