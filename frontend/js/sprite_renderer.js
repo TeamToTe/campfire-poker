@@ -57,6 +57,7 @@ function createCardElement(card, isHidden = false) {
   if (isHidden || !card) {
     const cardBackDiv = document.createElement('div');
     cardBackDiv.className = 'card-sprite card-back pixelated';
+    cardBackDiv.setAttribute('data-card-key', 'back');
     return cardBackDiv;
   }
 
@@ -69,12 +70,14 @@ function createCardElement(card, isHidden = false) {
     imgElem.className = 'card-sprite pixelated';
     imgElem.src = cardDataCache[key];
     imgElem.alt = `${rank} of ${suit}`;
+    imgElem.setAttribute('data-card-key', key);
     return imgElem;
   }
 
   // Fallback if sheet still loading
   const cardDiv = document.createElement('div');
   cardDiv.className = 'card-sprite pixelated';
+  cardDiv.setAttribute('data-card-key', key);
   const row = (typeof card.row === 'number') ? card.row : (SUIT_ROWS[suit] || 0);
   const col = (typeof card.col === 'number') ? card.col : getRankCol(rank);
 

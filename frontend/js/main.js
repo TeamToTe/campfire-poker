@@ -340,6 +340,48 @@ document.addEventListener('DOMContentLoaded', () => {
     btnStartHand.click();
   });
 
+  // Helper to reconcile cards without destroying/refreshing existing card elements in DOM
+  function syncCardsContainer(container, targetCards, isHidden = false) {
+    if (!container) return;
+
+    if (!targetCards || targetCards.length === 0) {
+      if (container.children.length > 0) {
+        container.innerHTML = '';
+      }
+      return;
+    }
+
+    const existingElems = Array.from(container.children);
+    const targetKeys = targetCards.map(c => (isHidden || !c) ? 'back' : `${c.suit}_${c.rank}`);
+
+    // Check if current DOM elements already match targetKeys exactly
+    const currentKeys = existingElems.map(el => el.getAttribute('data-card-key'));
+    const isSame = (currentKeys.length === targetKeys.length) && currentKeys.every((k, idx) => k === targetKeys[idx]);
+
+    if (isSame) {
+      // Elements are identical -> Keep existing DOM elements, zero refresh / zero flicker!
+      return;
+    }
+
+    // If new cards were simply dealt/appended (e.g. Flop -> Turn -> River)
+    if (currentKeys.length < targetKeys.length && currentKeys.every((k, idx) => k === targetKeys[idx])) {
+      for (let i = currentKeys.length; i < targetKeys.length; i++) {
+        const newCardElem = window.SpriteRenderer.createCardElement(targetCards[i], isHidden);
+        newCardElem.classList.add('card-animate-deal');
+        container.appendChild(newCardElem);
+      }
+      return;
+    }
+
+    // Otherwise (new hand dealt or showdown revealed), rebuild cleanly
+    container.innerHTML = '';
+    targetCards.forEach(c => {
+      const cardElem = window.SpriteRenderer.createCardElement(c, isHidden);
+      cardElem.classList.add('card-animate-deal');
+      container.appendChild(cardElem);
+    });
+  }
+
   // 11. Game State UI Renderer
   function onGameStateUpdate(state, lastEvent = "") {
     if (!state) return;
@@ -374,20 +416,23 @@ document.addEventListener('DOMContentLoaded', () => {
     btnOpenSeatPicker.innerText = `🪑 SEAT: ${SEAT_NAMES[heroSeat] || 'SOUTH'}`;
     btnOpenSeatPicker.disabled = state.hand_in_progress && state.stage !== 'WAITING' && state.stage !== 'SHOWDOWN';
 
-    // Render Community Cards
-    communityCardsBox.innerHTML = '';
+    // Render Community Cards smoothly
     if (state.community_cards && state.community_cards.length > 0) {
-      state.community_cards.forEach(card => {
-        const cardElem = window.SpriteRenderer.createCardElement(card, false);
-        communityCardsBox.appendChild(cardElem);
-      });
+      const placeholder = communityCardsBox.querySelector('span');
+      if (placeholder) {
+        communityCardsBox.innerHTML = '';
+      }
+      syncCardsContainer(communityCardsBox, state.community_cards, false);
     } else {
-      const placeholder = document.createElement('span');
-      placeholder.style.fontFamily = "var(--font-retro)";
-      placeholder.style.fontSize = "18px";
-      placeholder.style.color = "#6B7280";
-      placeholder.innerText = "WAITING FOR FLOP...";
-      communityCardsBox.appendChild(placeholder);
+      if (!communityCardsBox.querySelector('span')) {
+        communityCardsBox.innerHTML = '';
+        const placeholder = document.createElement('span');
+        placeholder.style.fontFamily = "var(--font-retro)";
+        placeholder.style.fontSize = "18px";
+        placeholder.style.color = "#6B7280";
+        placeholder.innerText = "WAITING FOR FLOP...";
+        communityCardsBox.appendChild(placeholder);
+      }
     }
 
     // Render 4 Player Seats
@@ -432,20 +477,17 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
 
-        // Render Player Cards
+        // Render Player Cards smoothly without re-rendering if unchanged
         const cardsContainer = document.getElementById(`cards-seat-${seatIdx}`);
         if (cardsContainer) {
-          cardsContainer.innerHTML = '';
           const revealCards = (p.id === 'p_human') || (state.stage === 'SHOWDOWN');
 
           if (p.cards && p.cards.length > 0 && (revealCards || !p.is_ai)) {
-            p.cards.forEach(c => {
-              const cardElem = window.SpriteRenderer.createCardElement(c, false);
-              cardsContainer.appendChild(cardElem);
-            });
+            syncCardsContainer(cardsContainer, p.cards, false);
           } else if (!p.folded && (p.chips > 0 || p.total_bet_in_hand > 0) && state.stage !== 'WAITING' && state.hand_in_progress) {
-            cardsContainer.appendChild(window.SpriteRenderer.createCardElement(null, true));
-            cardsContainer.appendChild(window.SpriteRenderer.createCardElement(null, true));
+            syncCardsContainer(cardsContainer, [null, null], true);
+          } else {
+            syncCardsContainer(cardsContainer, []);
           }
         }
       });
