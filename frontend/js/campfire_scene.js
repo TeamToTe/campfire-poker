@@ -720,17 +720,27 @@ class CampfireScene {
       this.ctx.fillRect(x + bw * 0.65, y - 1, 8, 3);
     };
 
-    // Log 0: South Log (Bottom)
-    drawLogBench(w * 0.33, h * 0.72, w * 0.34, 18);
+    const isMobile = w < 600;
 
-    // Log 1: West Log (Left)
-    drawLogBench(w * 0.08, h * 0.44, 26, h * 0.22);
-
-    // Log 2: North Log (Top)
-    drawLogBench(w * 0.36, h * 0.23, w * 0.28, 16);
-
-    // Log 3: East Log (Right)
-    drawLogBench(w * 0.88, h * 0.44, 26, h * 0.22);
+    if (isMobile) {
+      // Log 0: South Log (Bottom)
+      drawLogBench(w * 0.22, h * 0.72, w * 0.56, 14);
+      // Log 1: West Log (Left)
+      drawLogBench(2, h * 0.38, 12, h * 0.20);
+      // Log 2: North Log (Top)
+      drawLogBench(w * 0.24, h * 0.18, w * 0.52, 12);
+      // Log 3: East Log (Right)
+      drawLogBench(w - 14, h * 0.38, 12, h * 0.20);
+    } else {
+      // Log 0: South Log (Bottom)
+      drawLogBench(w * 0.33, h * 0.72, w * 0.34, 18);
+      // Log 1: West Log (Left)
+      drawLogBench(w * 0.08, h * 0.44, 26, h * 0.22);
+      // Log 2: North Log (Top)
+      drawLogBench(w * 0.36, h * 0.23, w * 0.28, 16);
+      // Log 3: East Log (Right)
+      drawLogBench(w * 0.88, h * 0.44, 26, h * 0.22);
+    }
   }
 
   getFormattedTime() {

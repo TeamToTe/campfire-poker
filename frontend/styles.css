@@ -981,16 +981,260 @@ header {
   color: #FCD34D;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for Tablets & Mobile */
 @media (max-width: 768px) {
-  .brand-title { font-size: 10px; }
-  .edition-tag { display: none; }
-  .btn-pixel { font-size: 8px; padding: 6px 8px; }
-  .card-sprite { width: 44px; height: 59px; }
-  .seat-1 { left: 8px; }
-  .seat-3 { right: 8px; }
-  #log-drawer { display: none; }
-  .seat-arena-container { width: 280px; height: 260px; }
-  .seat-spot { min-width: 80px; padding: 4px 6px; }
-  .seat-modal-box { width: 94%; }
+  header {
+    height: 46px;
+    padding: 0 8px;
+    justify-content: space-between;
+  }
+  .brand-title {
+    font-size: 9px;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .edition-tag {
+    display: none;
+  }
+  .header-status {
+    gap: 4px;
+    max-width: 68%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-end;
+  }
+  .header-status::-webkit-scrollbar {
+    display: none;
+  }
+  .header-status .btn-pixel, .header-status .badge {
+    font-size: 7px;
+    padding: 4px 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  #btn-time-cycle {
+    min-width: unset;
+    font-size: 13px;
+    padding: 2px 5px;
+  }
+
+  #game-viewport {
+    height: calc(100vh - 46px);
+  }
+
+  #poker-table-overlay {
+    height: calc(100vh - 46px - 145px);
+    padding: 4px;
+  }
+
+  /* Pot Badge positioned neatly at top-left */
+  #pot-badge-corner {
+    top: 6px;
+    left: 6px;
+    padding: 3px 6px;
+    gap: 4px;
+    border-width: 2px;
+  }
+  .pot-label { font-size: 7px; }
+  .pot-amount { font-size: 12px; }
+
+  /* Center Table Area */
+  .table-center-area {
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    gap: 3px;
+  }
+  .community-cards-box {
+    padding: 4px 6px;
+    gap: 3px;
+    min-height: 52px;
+  }
+  #stage-badge {
+    font-size: 7px;
+    padding: 2px 6px;
+  }
+
+  /* Compact Cards */
+  .card-sprite {
+    width: 34px;
+    height: 46px;
+    border-radius: 2px;
+  }
+
+  /* Compact Player Badges & Seating to prevent all collisions */
+  .player-badge {
+    min-width: unset;
+    width: auto;
+    max-width: 96px;
+    padding: 2px 4px;
+    gap: 4px;
+    border-width: 2px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  }
+  .avatar-frame {
+    width: 20px;
+    height: 20px;
+    border-width: 1px;
+  }
+  .avatar-icon {
+    font-size: 12px;
+  }
+  .player-name {
+    font-size: 6.5px;
+    margin-bottom: 1px;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .player-chips {
+    font-size: 9px;
+  }
+  .player-action-tag {
+    font-size: 6.5px;
+    min-height: 8px;
+  }
+
+  /* Fixed Mobile Seat Layout */
+  .seat-0 {
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .seat-1 {
+    top: 48%;
+    left: 4px;
+    transform: translateY(-50%);
+  }
+  .seat-2 {
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .seat-3 {
+    top: 48%;
+    right: 4px;
+    transform: translateY(-50%);
+  }
+
+  .player-cards-row {
+    gap: 2px;
+    margin-top: 2px;
+  }
+
+  .speech-bubble {
+    font-size: 11px;
+    padding: 2px 5px;
+    top: -26px;
+  }
+  .speech-bubble::after {
+    border-width: 4px 4px 0;
+    bottom: -4px;
+  }
+
+  /* Bottom Action Panel / HUD */
+  #action-panel {
+    padding: 5px 6px;
+    gap: 4px;
+    border-width: 3px;
+  }
+  .hand-gauge-wrapper {
+    gap: 4px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hand-rating-banner {
+    font-size: 7px;
+    line-height: 1.2;
+    text-align: left;
+  }
+  .hand-flame-meter {
+    width: 70px;
+    height: 11px;
+  }
+  .flame-percent {
+    font-size: 11px;
+    min-width: 22px;
+  }
+  .controls-row {
+    gap: 3px;
+    justify-content: center;
+    width: 100%;
+  }
+  .btn-hud {
+    font-size: 7.5px;
+    padding: 5px 7px;
+    min-height: 25px;
+  }
+  .raise-control-group {
+    padding: 2px 4px;
+    gap: 3px;
+    width: 100%;
+    justify-content: center;
+  }
+  .raise-slider {
+    width: 85px;
+  }
+  .raise-val-display {
+    font-size: 12px;
+    min-width: 30px;
+  }
+  .preset-row {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+    width: 100%;
+  }
+  .preset-btn {
+    font-size: 11px;
+    padding: 2px 5px;
+  }
+
+  #log-drawer {
+    display: none;
+  }
+
+  /* Modals */
+  #winner-overlay {
+    width: 90%;
+    max-width: 300px;
+    padding: 12px;
+  }
+  .winner-title { font-size: 10px; }
+  .winner-desc { font-size: 15px; }
+
+  .modal-content {
+    width: 92%;
+    max-width: 320px;
+    padding: 12px;
+  }
+  .modal-title { font-size: 10px; }
+  .modal-body-text { font-size: 15px; }
+  .seat-arena-container {
+    width: 240px;
+    height: 200px;
+  }
+  .seat-spot {
+    min-width: 60px;
+    padding: 2px 4px;
+  }
+  .seat-spot-label { font-size: 7px; }
+  .seat-spot-badge { font-size: 6.5px; }
+  .seat-modal-box, .reset-modal-box { width: 94%; }
+}
+
+@media (max-width: 380px) {
+  .card-sprite {
+    width: 29px;
+    height: 39px;
+  }
+  .player-badge {
+    max-width: 80px;
+  }
+  .player-name {
+    max-width: 48px;
+    font-size: 6px;
+  }
 }
