@@ -42,6 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnConfirmReset = document.getElementById('btn-confirm-reset');
   const btnCancelReset = document.getElementById('btn-cancel-reset');
 
+  const modalCardZoom = document.getElementById('modal-card-zoom');
+  const zoomModalTitle = document.getElementById('zoom-modal-title');
+  const zoomCardsContainer = document.getElementById('zoom-cards-container');
+  const zoomDesc = document.getElementById('zoom-desc');
+  const btnCloseZoom = document.getElementById('btn-close-zoom');
+
   const winnerOverlay = document.getElementById('winner-overlay');
   const winnerDesc = document.getElementById('winner-desc');
   const btnCloseWinner = document.getElementById('btn-close-winner');
@@ -237,9 +243,63 @@ document.addEventListener('DOMContentLoaded', () => {
     logMessage("Table reset to default $1,000 per player.");
   });
 
-  [modalSeatPicker, modalResetTable].forEach(modal => {
+  // Card Zoom Inspector Functions
+  function openCardZoom(title, cards, description) {
+    if (!modalCardZoom || !cards || cards.length === 0) return;
+    zoomModalTitle.innerText = title || "🔍 INSPECT CARDS";
+    zoomCardsContainer.innerHTML = '';
+    cards.forEach(c => {
+      const cardElem = window.SpriteRenderer.createCardElement(c, false);
+      cardElem.className = 'card-sprite zoom-card-sprite pixelated';
+      zoomCardsContainer.appendChild(cardElem);
+    });
+    zoomDesc.innerText = description || "";
+    modalCardZoom.classList.add('show');
+    if (window.AudioSynth) window.AudioSynth.playCardDeal();
+  }
+
+  function closeCardZoom() {
+    if (modalCardZoom) modalCardZoom.classList.remove('show');
+  }
+
+  if (btnCloseZoom) {
+    btnCloseZoom.addEventListener('click', closeCardZoom);
+  }
+
+  // Click on Hero Hole Cards to zoom
+  const heroCardsContainer = document.getElementById('cards-seat-0');
+  if (heroCardsContainer) {
+    heroCardsContainer.style.cursor = 'zoom-in';
+    heroCardsContainer.title = 'Click to zoom and inspect your hole cards';
+    heroCardsContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const hero = currentState && currentState.players ? currentState.players.find(p => p.id === 'p_human') : null;
+      if (hero && hero.cards && hero.cards.length > 0) {
+        const allCards = [...hero.cards, ...(currentState.community_cards || [])];
+        const evalRes = evaluateHandStrength(allCards);
+        openCardZoom("🔍 YOUR HOLE CARDS", hero.cards, evalRes.desc.toUpperCase());
+      }
+    });
+  }
+
+  // Click on Community Cards / Board area to zoom
+  if (communityCardsBox) {
+    communityCardsBox.style.cursor = 'zoom-in';
+    communityCardsBox.title = 'Click to zoom and inspect community board cards';
+    communityCardsBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentState && currentState.community_cards && currentState.community_cards.length > 0) {
+        const stg = currentState.stage || "BOARD";
+        openCardZoom(`🔍 COMMUNITY CARDS [${stg}]`, currentState.community_cards, `STAGE: ${stg} • ${currentState.community_cards.length} CARDS DEALT`);
+      }
+    });
+  }
+
+  // Close modals when clicking backdrop
+  [modalSeatPicker, modalResetTable, modalCardZoom].forEach(modal => {
+    if (!modal) return;
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
+      if (e.target === modal || e.target.classList.contains('zoom-cards-container')) {
         modal.classList.remove('show');
       }
     });
