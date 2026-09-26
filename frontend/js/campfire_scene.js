@@ -777,7 +777,6 @@ class CampfireScene {
     this.drawForestLayers(celestial);
     this.drawGround(celestial);
     this.drawCampfireGlow(celestial);
-    this.drawSeatingLogs(celestial);
     this.drawCampfire(celestial);
     this.drawSmoke(celestial);
     this.drawEmbers(celestial);

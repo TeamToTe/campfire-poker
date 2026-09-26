@@ -326,8 +326,8 @@ header {
 }
 
 .seat-1 {
-  top: 50%;
-  left: 20px;
+  top: 40%;
+  left: 25px;
   transform: translateY(-50%);
 }
 
@@ -338,8 +338,8 @@ header {
 }
 
 .seat-3 {
-  top: 48%;
-  right: 20px;
+  top: 40%;
+  right: 25px;
   transform: translateY(-50%);
 }
 
