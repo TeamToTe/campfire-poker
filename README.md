@@ -103,3 +103,35 @@ Module `backend/ai_agent.py` được thiết kế sẵn hook `get_llm_decision_
 - **Lá bài (`assets/cards.jpg`)**: Được cắt tự động thành grid 13 cột x 4 hàng tương ứng với 52 lá bài (Chuồn ♣, Bích ♠, Cơ ♥, Rô ♦).
 - **Chip cược (`assets/chips.jpg`)**: Được tách thành 5 loại chip (Đỏ $5, Xanh lá $25, Xanh dương $50, Vàng $100, Đen $500) hiển thị chồng chip cược trực quan.
 - **Khung cảnh lửa trại (`assets/style.jpg`)**: Render động bằng HTML5 Canvas với các hiệu ứng sao lấp lánh, đom đóm rực rỡ và đốm lửa trại bập bùng.
+
+---
+
+## 🌐 Hướng Dẫn Deploy Lên Cloud (Free & 1-Click)
+
+Dự án đã được cấu hình sẵn đầy đủ `render.yaml`, `Dockerfile`, `Procfile`, `requirements.txt` để deploy miễn phí lên các nền tảng đám mây:
+
+### 1. Deploy lên Render.com (Miễn phí & Tự động)
+1. Đăng nhập [Render.com](https://render.com) bằng tài khoản GitHub.
+2. Bấm **New +** -> Chọn **Web Service**.
+3. Chọn Repository `TeamToTe/campfire-poker`.
+4. Cấu hình:
+   - **Environment**: `Python 3` (hoặc `Docker`)
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+5. Bấm **Create Web Service**. Sau ~1-2 phút, Render sẽ cấp link URL (ví dụ: `https://campfire-poker.onrender.com`) để chơi trực tiếp online!
+
+### 2. Deploy lên Railway.app
+1. Truy cập [Railway.app](https://railway.app), bấm **New Project** -> **Deploy from GitHub repo**.
+2. Chọn `TeamToTe/campfire-poker`.
+3. Railway sẽ tự động nhận diện `Dockerfile` hoặc `Procfile` và build xong ngay lập tức.
+
+### 3. Deploy bằng Docker
+```bash
+docker build -t campfire-poker .
+docker run -p 8000:8000 campfire-poker
+```
+
+---
+
+## 📜 Bản Quyền & Giấy Phép (License)
+Dự án được phát hành dưới giấy phép mã nguồn mở MIT License. Tận hưởng những ván Poker ấm áp bên đốm lửa trại mùa hè! 🏕️🔥👑
