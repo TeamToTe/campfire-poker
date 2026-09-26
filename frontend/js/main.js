@@ -254,6 +254,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   );
 
+  if (serverStatusBadge) {
+    serverStatusBadge.style.cursor = 'pointer';
+    serverStatusBadge.title = 'Click to configure Backend URL (Render URL)';
+    serverStatusBadge.addEventListener('click', () => {
+      const current = window.BackendClient.baseUrl || "http://127.0.0.1:8000";
+      const customUrl = prompt("Enter Campfire Poker Backend URL (e.g., https://your-service.onrender.com):", current);
+      if (customUrl && customUrl.trim()) {
+        window.BackendClient.setServerUrl(customUrl.trim());
+        logMessage(`Backend server switched to: ${customUrl.trim()}`);
+      }
+    });
+  }
+
   // 9. Raise Slider & Presets
   raiseSlider.addEventListener('input', () => {
     raiseValDisplay.innerText = `$${raiseSlider.value}`;

@@ -5,7 +5,19 @@
 class BackendClient {
   constructor() {
     const loc = (typeof window !== 'undefined' && window.location) ? window.location : null;
-    if (loc && loc.origin && loc.origin.startsWith('http') && !loc.origin.includes(':5500') && !loc.origin.includes(':3000')) {
+    const urlParams = loc ? new URLSearchParams(loc.search) : null;
+    const queryBackend = urlParams ? urlParams.get('backend') : null;
+    const storedBackend = (typeof localStorage !== 'undefined') ? localStorage.getItem('campfire_backend_url') : null;
+    const customConfig = (typeof window !== 'undefined') ? window.CAMPFIRE_BACKEND_URL : null;
+
+    if (queryBackend) {
+      this.baseUrl = queryBackend.replace(/\/+$/, '');
+      if (typeof localStorage !== 'undefined') localStorage.setItem('campfire_backend_url', this.baseUrl);
+    } else if (storedBackend) {
+      this.baseUrl = storedBackend.replace(/\/+$/, '');
+    } else if (customConfig) {
+      this.baseUrl = customConfig.replace(/\/+$/, '');
+    } else if (loc && loc.origin && loc.origin.startsWith('http') && !loc.origin.includes(':5500') && !loc.origin.includes(':3000') && !loc.origin.includes('vercel.app') && !loc.origin.includes('github.io')) {
       this.baseUrl = loc.origin;
     } else {
       this.baseUrl = "http://127.0.0.1:8000";
@@ -18,6 +30,19 @@ class BackendClient {
     
     this.onStateUpdate = null;
     this.onConnectionStatus = null;
+  }
+
+  setServerUrl(newUrl) {
+    if (!newUrl) return;
+    this.baseUrl = newUrl.replace(/\/+$/, '');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('campfire_backend_url', this.baseUrl);
+    }
+    this.wsUrl = this.baseUrl.replace(/^http/, "ws") + "/ws/poker";
+    if (this.socket) {
+      try { this.socket.close(); } catch (e) {}
+    }
+    this.connect();
   }
 
   init(onStateUpdate, onConnectionStatus) {
